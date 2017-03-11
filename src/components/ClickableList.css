@@ -1,0 +1,37 @@
+
+.list {
+    padding: 0;
+    margin: 0;
+    width: 250px;
+    height: 500px;
+    overflow: auto;
+}
+
+.list-item {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    text-align: left;
+}
+
+.list-item > button {
+    text-decoration: underline;
+    color: dimgrey;
+    background-color: #cfcfcf;
+    border: none;
+    cursor: pointer;
+    display: block;
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 5px;
+}
+
+.list-item > button.selected {
+    background-color: #787878;
+    border: 3px solid #454545;
+    color: #dfdfdf;
+}
+
+.list-item > button:hover {
+    color: indianred;
+}
