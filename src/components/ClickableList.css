@@ -3,7 +3,7 @@
     padding: 0;
     margin: 0;
     width: 250px;
-    height: 500px;
+    height: 540px;
     overflow: auto;
 }
 
@@ -12,18 +12,19 @@
     padding: 0;
     margin: 0;
     text-align: left;
+    height: 40px;
+    margin-bottom: 5px;
 }
 
 .list-item > button {
     text-decoration: underline;
     color: dimgrey;
     background-color: #cfcfcf;
-    border: none;
+    border: 3px solid #bfbfbf;
     cursor: pointer;
     display: block;
     width: 100%;
-    padding: 10px;
-    margin-bottom: 5px;
+    height: 100%;
 }
 
 .list-item > button.selected {

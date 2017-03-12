@@ -10,6 +10,11 @@ export default class ClickableList extends Component {
         super(props);
         this.renderItem = this.renderItem.bind(this);
         this.onClick = this.onClick.bind(this);
+        this.onWheel = this.onWheel.bind(this);
+
+        this.state = {
+            startItem: 0
+        };
     }
 
     onClick(e) {
@@ -23,20 +28,32 @@ export default class ClickableList extends Component {
     }
 
     renderItem(item) {
-        const { selectedItems } = this.props;
+        const { selectedItems, makeLabel } = this.props;
         const className = selectedItems.contains(item.id) ? 'selected' : '';
         return (
             <li key={item.id} className='list-item'>
-                <button className={className} data-id={item.id} onClick={this.onClick}>{item.value}</button>
+                <button className={className} data-id={item.id} onClick={this.onClick}>{makeLabel(item)}</button>
             </li>
         );
     }
 
+    onWheel(e) {
+        const { items, startItem } = this.state;
+        let newStartItem = e.deltaY > 0 ? startItem + 1 : startItem - 1;
+        newStartItem = newStartItem < 0 ? 0 : newStartItem;
+        this.setState({
+            ...this.state,
+            startItem: newStartItem
+        });
+    }
+
     render() {
         const { items } = this.props;
-        const listItems = items.map(this.renderItem);
+        const { startItem } = this.state; 
+        const listItems = items.slice(startItem, startItem + 12).map(this.renderItem);
+
         return (
-            <ul className="list">
+            <ul onWheel={this.onWheel} className="list">
                 { listItems }
             </ul>
         );
@@ -53,4 +70,8 @@ ClickableList.propTypes = {
     onClick: func.isRequired,
     onSelect: func.isRequired,
     selectedItems: instanceOf(ImmutableSet).isRequired
+};
+
+ClickableList.defaultProps = {
+    makeLabel: item => item.value
 };

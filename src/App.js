@@ -3,7 +3,7 @@ import logo from './logo.svg';
 import './App.css';
 
 import ClickableList from './components/ClickableList';
-import { draculaWordsPromise, globalSequence, uniq } from './utils';
+import { draculaWordsPromise, globalSequence } from './utils';
 import ImmutableSet from './ImmutableSet';
 
 // const items = [
@@ -13,6 +13,8 @@ import ImmutableSet from './ImmutableSet';
 //     {id: 1004, value: 'Zapp Brannigan'}
 // ];
 
+const filterCache = {};
+
 class App extends Component {
     constructor() {
         super();
@@ -20,7 +22,7 @@ class App extends Component {
             items: [],
             loading: true,
             filter: '',
-            selectedItems: new ImmutableSet()
+            selectedItems: new ImmutableSet(),
         };
         this.init = this.init.bind(this);
         this.setFilter = this.setFilter.bind(this);
@@ -32,9 +34,6 @@ class App extends Component {
     }
     init() {
         draculaWordsPromise
-            .then(words => uniq(words))
-            .then(words => Array.from(words))
-            .then(words => words.slice(0, 500))
             .then(words => words.map(word => ({
                 id: globalSequence(),
                 value: word
@@ -59,11 +58,11 @@ class App extends Component {
     onSelect(id) {
         const { selectedItems } = this.state;
         const nextSelectedItems = selectedItems.contains(id) ? selectedItems.remove(id) : selectedItems.add(id);
-        console.log(selectedItems, nextSelectedItems);
-        this.setState({
-            ...this.state,
+        const nextState = Object.assign({}, this.state, {
             selectedItems: nextSelectedItems
         });
+
+        this.setState(nextState);
     }
     deselectAll(e) {
         this.setState({
@@ -72,15 +71,24 @@ class App extends Component {
         });
     }
     render() {
+        console.time('>render app');
         const { items, loading, filter, selectedItems } = this.state;
         const loadingLabel = loading ? <span>please wait...</span> : null;
         const selectedListItems = selectedItems.map(id => <li key={id}><strong>{id}</strong></li>);
-        const filteredItems = items.filter(item => item.value.toLowerCase().indexOf(filter) > -1);
+        console.time('>>filter');
+        if (!filterCache[filter] && filter.length > 0) {
+            filterCache[filter] = items.filter(item => item.value.toLowerCase().indexOf(filter) > -1);
+        }
+        const filteredItems = (filterCache[filter] || items);
+        console.timeEnd('>>filter');
+        const itemCountLabel = `Showing ${filteredItems.length} of ${items.length}`;
+
         const deselectAllButton = 
             selectedListItems.length > 0 ? 
                 <button onClick={this.deselectAll}>Deselect All</button> : 
                 null;
 
+        console.timeEnd('>render app');
         return (
             <div className="App">
                 <div className="App-header">
@@ -93,7 +101,9 @@ class App extends Component {
                         items={filteredItems} 
                         onClick={this.onClick} 
                         onSelect={this.onSelect}
-                        selectedItems={selectedItems} />
+                        selectedItems={selectedItems}
+                        makeLabel={item => `${item.value} (${item.id})`} />
+                    <span className="count-label">{itemCountLabel}</span>
                 </div>
                 <div className="right-pane">
                     { deselectAllButton }

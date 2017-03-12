@@ -65,7 +65,7 @@ export const draculaWordsPromise =
     fetch('dracula.txt')
         .then(response => response.text())
         .then(text => textToWords(text).asList())
-        .then(words => words.map(word => word.replace(/[,.]/g)))
+        .then(words => words.map(word => word.replace(/[,.]/g, '')))
         .then(words => words.filter(word => word.length > 3))
         .then(words => words.filter(word => !(!!word.match(/[^a-zA-Z]/))));
 
@@ -92,3 +92,14 @@ export const globalSequence = createSequence();
 export function randomString(len = 10) {
     return capitalize(range(0, len).map(() => randomChr()).join(''));
 }
+
+export const Sorter = {
+    String: {
+        asc: function(a, b) {
+            return a > b;
+        },
+        desc: function(a, b) {
+            return a <= b;
+        }
+    }
+};

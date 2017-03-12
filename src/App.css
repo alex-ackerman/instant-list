@@ -8,6 +8,10 @@
     float: left;
 }
 
+.count-label {
+    font-size: 10pt;
+}
+
 .right-pane {
     width: 350px;
     padding: 20px;
@@ -15,11 +19,12 @@
 }
 
 .filter-box {
-    height: 25px;
     width: 100%;
+    line-height: 1.8em;
     margin-bottom: 10px;
     border: none;
-    box-shadow: 0 1px 5px #ddd;
+    box-shadow: 0 1px 5px #888;
+    font-size: 18pt;
 }
 
 .App-logo {
