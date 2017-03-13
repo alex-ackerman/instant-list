@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import './ClickableList.css';
 import ImmutableSet from '../ImmutableSet';
 
-const { arrayOf, shape, number, string, func, instanceOf } = React.PropTypes;
+const minScrollHandleHeight = 25;
 
 export default class ClickableList extends Component {
 
@@ -11,9 +11,11 @@ export default class ClickableList extends Component {
         this.renderItem = this.renderItem.bind(this);
         this.onClick = this.onClick.bind(this);
         this.onWheel = this.onWheel.bind(this);
+        this.renderScrollHandle = this.renderScrollHandle.bind(this);
 
         this.state = {
-            startItem: 0
+            startItem: 0,
+            scrollHandleOffset: 0
         };
     }
 
@@ -38,29 +40,51 @@ export default class ClickableList extends Component {
     }
 
     onWheel(e) {
-        const { items, startItem } = this.state;
+        const { items } = this.props;
+        const { startItem } = this.state;
         let newStartItem = e.deltaY > 0 ? startItem + 1 : startItem - 1;
         newStartItem = newStartItem < 0 ? 0 : newStartItem;
+        newStartItem = newStartItem > items.length - 1 ? items.length - 1 : newStartItem;
+        
+        const nextScrollHandleOffset = Math.floor(newStartItem / items.length * 540);
+
         this.setState({
             ...this.state,
-            startItem: newStartItem
+            startItem: newStartItem,
+            scrollHandleOffset: nextScrollHandleOffset
         });
+    }
+
+    renderScrollHandle() {
+        const { scrollHandleOffset } = this.state;
+        const style = { marginTop: scrollHandleOffset };
+        return <div className="scroll-handle" style={style} />;
     }
 
     render() {
         const { items } = this.props;
         const { startItem } = this.state; 
         const listItems = items.slice(startItem, startItem + 12).map(this.renderItem);
+        const scrollHandle = this.renderScrollHandle();
 
         return (
-            <ul onWheel={this.onWheel} className="list">
-                { listItems }
-            </ul>
+            <div>
+                <div className="list-container">
+                    <ul onWheel={this.onWheel} className="list">
+                        { listItems }
+                    </ul>
+                    <div className="scroll-bar">
+                        { scrollHandle }
+                    </div>
+                    <div className="clear-both" />
+                </div>
+            </div>
         );
     }
 
 }
 
+const { arrayOf, shape, number, string, func, instanceOf } = React.PropTypes;
 
 ClickableList.propTypes = {
     items: arrayOf(shape({
